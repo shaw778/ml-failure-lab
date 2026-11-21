@@ -20,11 +20,11 @@ def fit_fixture(seed: int = 42) -> tuple[LinearRegression, list[str]]:
     return model, list(TRAINING_COLUMNS)
 
 
-def align_features(
+def validate_columns(
     record: Mapping[str, float] | Sequence[tuple[str, float]],
     expected_columns: Sequence[str],
-) -> tuple[list[str], np.ndarray]:
-    """Validate and align named features to the expected schema order.
+) -> dict[str, float]:
+    """Validate that input contains all expected features without duplicates or extras.
 
     Rejection policy:
     - Sequence with duplicate feature names raises ValueError.
@@ -50,7 +50,16 @@ def align_features(
     if extra:
         raise ValueError(f"Unrecognized feature columns: {extra}")
 
-    aligned_values = [float(mapping[col]) for col in expected_columns]
+    return {col: float(mapping[col]) for col in expected_columns}
+
+
+def align_features(
+    record: Mapping[str, float] | Sequence[tuple[str, float]],
+    expected_columns: Sequence[str],
+) -> tuple[list[str], np.ndarray]:
+    """Validate and align named features to the expected schema order."""
+    validated = validate_columns(record, expected_columns)
+    aligned_values = [validated[col] for col in expected_columns]
     return list(expected_columns), np.array([aligned_values], dtype=float)
 
 
@@ -70,9 +79,9 @@ def report(
     else:
         input_pairs = list(test_input)
 
-    # Manual ground truth calculation: 1.0 * a + 10.0 * b
-    input_dict = dict(input_pairs)
-    expected_prediction = 1.0 * input_dict["a"] + 10.0 * input_dict["b"]
+    # Validate columns before calculating the expected value
+    validated_mapping = validate_columns(input_pairs, expected_columns)
+    expected_prediction = 1.0 * validated_mapping["a"] + 10.0 * validated_mapping["b"]
 
     if approach == "bad":
         # Misleading operation: convert directly to a NumPy array in incoming key order
@@ -102,7 +111,12 @@ def require_column_schema_alignment(result: dict) -> None:
             f"Input features {result['input_columns']} must be aligned to "
             f"model schema {result['model_columns']} before prediction."
         )
-    if not math.isclose(result["prediction"], result["expected_prediction"], rel_tol=1e-5):
+    if not math.isclose(
+        result["prediction"],
+        result["expected_prediction"],
+        rel_tol=1e-5,
+        abs_tol=1e-5,
+    ):
         raise ValueError(
             f"Prediction {result['prediction']} does not match expected "
             f"{result['expected_prediction']}."

@@ -54,13 +54,24 @@ def test_align_features_rejects_duplicate_columns_in_sequence():
         case.align_features(pairs, ["a", "b"])
 
 
+def test_report_validates_columns_before_calculating_expected_prediction():
+    with pytest.raises(ValueError, match="Missing required feature columns: \\['b'\\]"):
+        case.report("bad", {"a": 1.0})
+    with pytest.raises(ValueError, match="Missing required feature columns: \\['b'\\]"):
+        case.report("fixed", {"a": 1.0})
+    with pytest.raises(ValueError, match="Unrecognized feature columns: \\['extra'\\]"):
+        case.report("fixed", {"a": 1.0, "b": 2.0, "extra": 3.0})
+
+
 def test_manual_calculation_matches_aligned_prediction():
     test_cases = [
         ({"a": 2.0, "b": 4.0}, 42.0),
         ({"b": 10.0, "a": 0.5}, 100.5),
         ({"a": -1.0, "b": 3.0}, 29.0),
+        ({"a": 10.0, "b": -1.0}, 0.0),  # near-zero / zero prediction target
     ]
     for test_row, expected_val in test_cases:
         res = case.report("fixed", test_input=test_row)
         assert res["prediction"] == pytest.approx(expected_val, abs=1e-5)
         assert res["columns_aligned"]
+        case.require_column_schema_alignment(res)

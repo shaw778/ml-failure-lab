@@ -40,7 +40,7 @@ python -m ml_failure_lab verify numeric-feature-order --approach bad
 python -m ml_failure_lab verify numeric-feature-order --approach fixed
 ```
 
-The `bad` verification exits with code 1, reporting that column schema alignment was violated and the prediction was $12.0$. The `fixed` verification exits with code 0. Tests verify that the corrected prediction matches manual ground truth ($21.0$) within floating-point tolerance $10^{-5}$, and assert rejection policies for missing, duplicate, and extra feature names.
+The `bad` verification exits with code 1, reporting that column schema alignment was violated and the prediction was $12.0$. The `fixed` verification exits with code 0. Tests verify that the corrected prediction matches manual ground truth ($21.0$) within relative and absolute floating-point tolerance $10^{-5}$ (supporting near-zero predictions), validate columns before calculating expectations, and assert rejection policies for missing, duplicate, and extra feature names.
 
 ## Limits and reference
 
