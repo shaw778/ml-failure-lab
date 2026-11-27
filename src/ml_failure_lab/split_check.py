@@ -15,7 +15,8 @@ def read_rows(path: Path, columns: list[str]) -> list[dict[str, str]]:
         if missing:
             raise ValueError(f"{path.name}: missing columns: {', '.join(sorted(missing))}.")
         rows = []
-        for line, row in enumerate(reader, start=2):
+        for row in reader:
+            line = reader.line_num
             if None in row or any(value is None for value in row.values()):
                 raise ValueError(f"{path.name}: malformed CSV record at line {line}.")
             if any(not row[column].strip() for column in columns):
