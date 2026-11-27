@@ -30,7 +30,7 @@ This computes test statistics $\mu_{\text{test}} = 11.0$ and $\sigma_{\text{test
 
 $$[[-1.0], [1.0]]$$
 
-Even though the transformed array has valid dimensions and numeric types, its coordinates are inverted relative to the training feature space. A model or threshold rule trained to recognize $z > 5.0$ as a high-value signal fails silently, outputting $[0, 0]$ instead of $[1, 1]$.
+Even though the transformed array has valid dimensions and numeric types, its coordinates are shifted relative to the training feature space. A model or threshold rule trained to recognize $z > 5.0$ as a high-value signal fails silently, outputting $[0, 0]$ instead of $[1, 1]$.
 
 The correction reuses the pre-fitted transformer from training:
 

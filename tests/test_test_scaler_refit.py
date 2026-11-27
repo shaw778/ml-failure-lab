@@ -52,9 +52,36 @@ def test_invalid_input_dimensions_are_rejected():
         case.report("fixed", test_data=np.array([[1.0, 2.0], [3.0, 4.0]]))
 
 
+def test_mismatched_parameters_raise_in_require():
+    mismatched_mean_result = {
+        "applied_mean": 2.0,
+        "training_mean": 1.0,
+        "applied_scale": 1.0,
+        "training_scale": 1.0,
+        "transformed_values": [9.0, 11.0],
+        "expected_transformed_values": [9.0, 11.0],
+    }
+    with pytest.raises(ValueError, match="parameters were mean=1.0 and scale=1.0"):
+        case.require_training_scaler_parameters(mismatched_mean_result)
+
+    mismatched_scale_result = {
+        "applied_mean": 1.0,
+        "training_mean": 1.0,
+        "applied_scale": 2.0,
+        "training_scale": 1.0,
+        "transformed_values": [9.0, 11.0],
+        "expected_transformed_values": [9.0, 11.0],
+    }
+    with pytest.raises(ValueError, match="parameters were mean=1.0 and scale=1.0"):
+        case.require_training_scaler_parameters(mismatched_scale_result)
+
+
 def test_transformed_values_mismatch_raises_in_require():
     invalid_result = {
-        "reused_training_parameters": True,
+        "applied_mean": 1.0,
+        "training_mean": 1.0,
+        "applied_scale": 1.0,
+        "training_scale": 1.0,
         "transformed_values": [1.0, 2.0],
         "expected_transformed_values": [9.0, 11.0],
     }

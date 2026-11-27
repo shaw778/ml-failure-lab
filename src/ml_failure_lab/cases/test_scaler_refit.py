@@ -66,7 +66,12 @@ def report(approach: str, test_data: np.ndarray | list[float] | None = None) -> 
 
 
 def require_training_scaler_parameters(result: dict) -> None:
-    if not result["reused_training_parameters"]:
+    if not (
+        math.isclose(result["applied_mean"], result["training_mean"], rel_tol=1e-5, abs_tol=1e-5)
+        and math.isclose(
+            result["applied_scale"], result["training_scale"], rel_tol=1e-5, abs_tol=1e-5
+        )
+    ):
         raise ValueError(
             f"Test data was scaled using mean={result['applied_mean']} and "
             f"scale={result['applied_scale']}, but training parameters were "
