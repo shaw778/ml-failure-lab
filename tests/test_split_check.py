@@ -50,6 +50,16 @@ def test_csv_matching_is_exact_and_supports_quoted_unicode(tmp_path):
     assert report["exact_feature_overlap"]["distinct_shared_rows"] == 0
 
 
+def test_valid_multiline_fields_are_supported(tmp_path):
+    train = write_csv(tmp_path / "train.csv", [("A\nB", "1"), ("C", "2")])
+    test = write_csv(tmp_path / "test.csv", [("A\nB", "1"), ("D", "3")])
+    report = check_split(train, test, "source_id", ["feature"], require_new_ids=True)
+    assert report["status"] == "FAIL"
+    assert report["shared_ids"] == 1
+    assert report["train_rows"] == 2
+    assert report["test_rows"] == 2
+
+
 @pytest.mark.parametrize(
     "contents,match",
     [
@@ -60,6 +70,8 @@ def test_csv_matching_is_exact_and_supports_quoted_unicode(tmp_path):
         ("source_id,feature\n ,1\n", "blank"),
         ("source_id,feature\nA\n", "malformed"),
         ("source_id,feature\nA,1,extra\n", "malformed"),
+        ('source_id,feature\n"A\nB",1\nC,2,extra\n', "malformed CSV record at line 4"),
+        ('source_id,feature\n"A\nB",1\nC, \n', "blank checked value at line 4"),
     ],
 )
 def test_invalid_input_is_not_reported_as_clean(tmp_path, contents, match):
