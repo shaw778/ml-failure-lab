@@ -5,6 +5,7 @@ from ml_failure_lab.cases import (
     minority_recall,
     numeric_feature_order,
     source_image_split,
+    test_scaler_refit,
     unequal_batch_metrics,
 )
 
@@ -16,4 +17,5 @@ CASES = {
     "different-comparison-records": different_comparison_records,
     "unequal-batch-metrics": unequal_batch_metrics,
     "numeric-feature-order": numeric_feature_order,
+    "test-scaler-refit": test_scaler_refit,
 }

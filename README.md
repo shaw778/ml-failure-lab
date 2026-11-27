@@ -69,6 +69,7 @@ See the [CSV walkthrough](docs/checking-your-split.md) for supplied examples, ex
 | [different-comparison-records](docs/cases/different-comparison-records.md) | Were candidates evaluated on the same held-out records? | Aligns predictions and targets by record ID, then compares the same test set |
 | [unequal-batch-metrics](docs/cases/unequal-batch-metrics.md) | Does the batch mean measure accuracy over all records? | Counts correct predictions across all records |
 | [numeric-feature-order](docs/cases/numeric-feature-order.md) | Does passing a NumPy array preserve the meaning of numeric columns? | Aligns named columns to the training schema order before prediction |
+| [test-scaler-refit](docs/cases/test-scaler-refit.md) | Did test preprocessing preserve the training scale and origin? | Transforms test inputs using the training-fitted scaler parameters |
 
 Run another case or print structured results:
 
